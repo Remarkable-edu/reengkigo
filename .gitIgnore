@@ -2,5 +2,5 @@
 .DS_Store
 
 # build folder
-frontend/rust-lib/target
+
 frontend/ffi_binary
