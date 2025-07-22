@@ -1,0 +1,12 @@
+[package]
+name = "dart-ffi"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+test-lib = { path = "../test-lib" }
+prost = "0.12"
+
+[lib]
+name = "dart_ffi"
+crate-type = ["cdylib", "staticlib"]
