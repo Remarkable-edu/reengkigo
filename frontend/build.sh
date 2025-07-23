@@ -116,6 +116,75 @@ verify_prerequisites() {
     echo -e "${GREEN}✓ Prerequisites verified${NC}"
 }
 
+generate_protobuf_files() {
+    echo -e "${BLUE}🔧 Generating protobuf files...${NC}"
+    
+    # Check if protoc is available
+    if ! command -v protoc &> /dev/null; then
+        echo -e "${YELLOW}⚠️  protoc not found, skipping protobuf generation${NC}"
+        return
+    fi
+    
+    # Add dart protoc plugin to PATH
+    export PATH="$PATH:$HOME/.pub-cache/bin"
+    
+    # Check if protoc-gen-dart is available
+    if ! command -v protoc-gen-dart &> /dev/null; then
+        echo -e "${YELLOW}⚠️  protoc-gen-dart not found, installing...${NC}"
+        cd "$FLUTTER_PROJECT_PATH"
+        dart pub global activate protoc_plugin 21.1.2
+        cd ..
+    fi
+    
+    # Generate protobuf files for Flutter
+    if [ -d "proto" ]; then
+        # Count .proto files
+        proto_count=$(find proto -name "*.proto" -type f | wc -l)
+        
+        if [ "$proto_count" -gt 0 ]; then
+            echo -e "${BLUE}  Generating Dart protobuf files...${NC}"
+            echo -e "${BLUE}    Found $proto_count proto file(s)${NC}"
+            
+            cd "$FLUTTER_PROJECT_PATH"
+            
+            # Create generated directory if it doesn't exist
+            mkdir -p lib/generated
+            
+            # Find and process all .proto files
+            find ../proto -name "*.proto" -type f | while read proto_file; do
+                proto_name=$(basename "$proto_file")
+                echo -e "${BLUE}      Processing: $proto_name${NC}"
+                
+                # Generate protobuf files for each .proto file
+                protoc --dart_out=lib/generated --proto_path=../proto "$proto_file"
+                
+                if [ $? -ne 0 ]; then
+                    echo -e "${RED}      ✗ Failed to generate: $proto_name${NC}"
+                fi
+            done
+            
+            # Check if any files were generated
+            generated_files=$(find lib/generated -name "*.pb.dart" -type f | wc -l)
+            
+            if [ "$generated_files" -gt 0 ]; then
+                echo -e "${GREEN}    ✓ Protobuf files generated successfully${NC}"
+                echo -e "${BLUE}    Generated files:${NC}"
+                ls -la lib/generated/*.pb.dart 2>/dev/null || echo "      No protobuf files found"
+            else
+                echo -e "${RED}    ✗ No protobuf files were generated${NC}"
+            fi
+            
+            cd ..
+        else
+            echo -e "${YELLOW}    ⚠️  No .proto files found in proto/ directory${NC}"
+        fi
+    else
+        echo -e "${YELLOW}    ⚠️  Proto directory not found${NC}"
+    fi
+    
+    echo -e "${GREEN}✅ Protobuf generation completed${NC}"
+}
+
 # =============================================================================
 # Build Functions
 # =============================================================================
@@ -271,6 +340,9 @@ main() {
     
     # Verify prerequisites
     verify_prerequisites
+    
+    # Generate protobuf files
+    generate_protobuf_files
     
     # Build Rust libraries
     build_rust_libraries

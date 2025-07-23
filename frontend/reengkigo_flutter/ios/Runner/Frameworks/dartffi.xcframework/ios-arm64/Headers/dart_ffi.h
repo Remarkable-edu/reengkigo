@@ -12,16 +12,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-double simple_add(double a,
-                  double b);
+char *login(const uint8_t *request_bytes,
+            uintptr_t request_len);
 
-double simple_multiply(double a,
-                       double b);
-
-char *simple_greet(const char *name);
-
-void free_string(char *s);
-
-char *test_greet(const char *name);
+void free_string(char *ptr);
 
 #endif  /* SIMPLE_FFI_H */

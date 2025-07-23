@@ -33,24 +33,24 @@ echo "📦 Backed up project file"
 # We'll modify the project to include our static library
 
 # Add framework search path to Runner app configurations
-if ! grep -q "FRAMEWORK_SEARCH_PATHS.*Frameworks" "$PROJECT_FILE"; then
+if ! grep -q '"\$(PROJECT_DIR)/Runner/Frameworks"' "$PROJECT_FILE"; then
     echo "📁 Adding framework search paths..."
-    
+
     # Add to Debug configuration after LD_RUNPATH_SEARCH_PATHS
     sed -i '' '/97C147061CF9000F007C117D.*Debug/,/};/{
-        /);$/{
-            a\
+        /LD_RUNPATH_SEARCH_PATHS/,/);/{
+            /);/a\
 				FRAMEWORK_SEARCH_PATHS = (\
 					"$(inherited)",\
 					"$(PROJECT_DIR)/Runner/Frameworks",\
 				);
         }
     }' "$PROJECT_FILE"
-    
-    # Add to Release configuration after LD_RUNPATH_SEARCH_PATHS  
+
+    # Add to Release configuration
     sed -i '' '/97C147071CF9000F007C117D.*Release/,/};/{
-        /);$/{
-            a\
+        /LD_RUNPATH_SEARCH_PATHS/,/);/{
+            /);/a\
 				FRAMEWORK_SEARCH_PATHS = (\
 					"$(inherited)",\
 					"$(PROJECT_DIR)/Runner/Frameworks",\
@@ -59,38 +59,36 @@ if ! grep -q "FRAMEWORK_SEARCH_PATHS.*Frameworks" "$PROJECT_FILE"; then
     }' "$PROJECT_FILE"
 fi
 
+
 # Add other linker flags to Runner app configurations
-if ! grep -q "OTHER_LDFLAGS.*force_load.*libdart_ffi" "$PROJECT_FILE"; then
+if ! grep -q 'libdart_ffi\.a' "$PROJECT_FILE"; then
     echo "🔗 Adding linker flags..."
-    
-    # Add to Debug configuration after FRAMEWORK_SEARCH_PATHS
+
+    # Add to Debug configuration
     sed -i '' '/97C147061CF9000F007C117D.*Debug/,/};/{
-        /FRAMEWORK_SEARCH_PATHS = (/,/);/{
-            /);$/{
-                a\
+        /FRAMEWORK_SEARCH_PATHS/,/);/{
+            /);/a\
 				OTHER_LDFLAGS = (\
 					"$(inherited)",\
 					"-force_load",\
-					"$(PROJECT_DIR)/Runner/Frameworks/dartffi.xcframework/ios-arm64-simulator/libdart_ffi_sim.a",\
+					"$(PROJECT_DIR)/Runner/Frameworks/dartffi.xcframework/ios-arm64/libdart_ffi.a",\
 				);
-            }
         }
     }' "$PROJECT_FILE"
-    
-    # Add to Release configuration after FRAMEWORK_SEARCH_PATHS
+
+    # Add to Release configuration
     sed -i '' '/97C147071CF9000F007C117D.*Release/,/};/{
-        /FRAMEWORK_SEARCH_PATHS = (/,/);/{
-            /);$/{
-                a\
+        /FRAMEWORK_SEARCH_PATHS/,/);/{
+            /);/a\
 				OTHER_LDFLAGS = (\
 					"$(inherited)",\
 					"-force_load",\
-					"$(PROJECT_DIR)/Runner/Frameworks/dartffi.xcframework/ios-arm64-simulator/libdart_ffi_sim.a",\
+					"$(PROJECT_DIR)/Runner/Frameworks/dartffi.xcframework/ios-arm64/libdart_ffi.a",\
 				);
-            }
         }
     }' "$PROJECT_FILE"
 fi
+
 
 echo "✅ iOS FFI setup completed!"
 echo "📱 The app should now be able to load the Rust FFI library"

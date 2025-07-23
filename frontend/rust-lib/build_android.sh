@@ -7,6 +7,8 @@ set -e
 
 echo "Building Android JNI libraries..."
 
+
+
 # library config
 LIB_NAME="dart_ffi"
 OUTPUT_DIR="../ffi_binary/android/app/src/main/jniLibs"
@@ -55,31 +57,56 @@ fi
 # Cargo cross compile
 mkdir -p .cargo
 NDK_PATH=$(eval echo ${ANDROID_NDK_HOME})
+TOOLCHAIN_PATH="${NDK_PATH}/toolchains/llvm/prebuilt/darwin-x86_64/bin"
 
-
+# .cargo/config.toml 파일 생성 (링커 경로에서 API 레벨 제거)
 cat > .cargo/config.toml << EOF
 [target.aarch64-linux-android]
-ar = "${NDK_PATH}/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-ar"
-linker = "${NDK_PATH}/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android21-clang"
+ar = "${TOOLCHAIN_PATH}/llvm-ar"
+linker = "${TOOLCHAIN_PATH}/aarch64-linux-android21-clang"
 
 [target.armv7-linux-androideabi]
-ar = "${NDK_PATH}/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-ar"
-linker = "${NDK_PATH}/toolchains/llvm/prebuilt/darwin-x86_64/bin/armv7a-linux-androideabi21-clang"
+ar = "${TOOLCHAIN_PATH}/llvm-ar"
+linker = "${TOOLCHAIN_PATH}/armv7a-linux-androideabi21-clang"
 
 [target.x86_64-linux-android]
-ar = "${NDK_PATH}/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-ar"
-linker = "${NDK_PATH}/toolchains/llvm/prebuilt/darwin-x86_64/bin/x86_64-linux-android21-clang"
+ar = "${TOOLCHAIN_PATH}/llvm-ar"
+linker = "${TOOLCHAIN_PATH}/x86_64-linux-android21-clang"
 
 [target.i686-linux-android]
-ar = "${NDK_PATH}/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-ar"
-linker = "${NDK_PATH}/toolchains/llvm/prebuilt/darwin-x86_64/bin/i686-linux-android21-clang"
+ar = "${TOOLCHAIN_PATH}/llvm-ar"
+linker = "${TOOLCHAIN_PATH}/i686-linux-android21-clang"
 EOF
-
-
 
 # Android build - build only selected targets
 for target in "${ANDROID_TARGETS[@]}"; do
     echo "Building $target..."
+    
+    # 아키텍처에 맞는 컴파일러 환경 변수 설정
+    case "$target" in
+        "aarch64-linux-android")
+            export AR_aarch64_linux_android="${TOOLCHAIN_PATH}/llvm-ar"
+            export CC_aarch64_linux_android="${TOOLCHAIN_PATH}/aarch64-linux-android21-clang"
+            export CXX_aarch64_linux_android="${TOOLCHAIN_PATH}/aarch64-linux-android21-clang++"
+            ;;
+        "armv7-linux-androideabi")
+            export AR_armv7_linux_androideabi="${TOOLCHAIN_PATH}/llvm-ar"
+            export CC_armv7_linux_androideabi="${TOOLCHAIN_PATH}/armv7a-linux-androideabi21-clang"
+            export CXX_armv7_linux_androideabi="${TOOLCHAIN_PATH}/armv7a-linux-androideabi21-clang++"
+            ;;
+        "x86_64-linux-android")
+            export AR_x86_64_linux_android="${TOOLCHAIN_PATH}/llvm-ar"
+            export CC_x86_64_linux_android="${TOOLCHAIN_PATH}/x86_64-linux-android21-clang"
+            export CXX_x86_64_linux_android="${TOOLCHAIN_PATH}/x86_64-linux-android21-clang++"
+            ;;
+        "i686-linux-android")
+            export AR_i686_linux_android="${TOOLCHAIN_PATH}/llvm-ar"
+            export CC_i686_linux_android="${TOOLCHAIN_PATH}/i686-linux-android21-clang"
+            export CXX_i686_linux_android="${TOOLCHAIN_PATH}/i686-linux-android21-clang++"
+            ;;
+    esac
+
+    # Cargo 빌드 실행
     cargo build --release --target "$target" -p dart-ffi
     
     # Copy to appropriate ABI directory

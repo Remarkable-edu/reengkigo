@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package login;
+
+message LoginRequest {
+    string account = 1;
+    string password = 2;
+}
+
+message Auth {
+    int32 account_id = 1;
+    int32 account_type_id = 2;
+    int32 agency_id = 3;
+    int32 academy_id = 4;
+    string account = 5;
+    int32 state = 6;
+}
+
+message LoginResponse {
+    Auth auth = 1;
+}

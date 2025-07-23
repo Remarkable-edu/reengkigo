@@ -1,6 +1,7 @@
 [workspace]
 members = [
-    "test-lib",
     "dart-ffi",
+    "http-lib",
+    "proto-lib",
 ]
 

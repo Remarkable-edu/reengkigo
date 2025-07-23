@@ -1,7 +1,10 @@
 import 'dart:ffi' as ffi;
 import 'dart:io' show Platform;
+import 'dart:typed_data';
+import 'dart:convert';
 import 'package:ffi/ffi.dart';
-import './generated/bindings.dart';
+import 'package:reengkigo_flutter/generated/ffi/bindings.dart';
+
 
 class ReengkigoFFI {
   static ReengkigoBindings? _bindings;
@@ -26,28 +29,33 @@ class ReengkigoFFI {
     }
   }
   
-  /// Add two numbers using Rust implementation
-  static double add(double a, double b) {
-    return bindings.simple_add(a, b);
-  }
-  
-  /// Multiply two numbers using Rust implementation
-  static double multiply(double a, double b) {
-    return bindings.simple_multiply(a, b);
-  }
-  
-  /// Greet someone using Rust implementation
-  static String greet(String name) {
-    final namePointer = name.toNativeUtf8().cast<ffi.Char>();
-    final resultPointer = bindings.simple_greet(namePointer);
-    final result = resultPointer.cast<Utf8>().toDartString();
+  static Future<Uint8List?> login(Uint8List requestBytes) async {
+    final binding = bindings;
     
-    // Free the memory allocated by Rust
-    bindings.free_string(resultPointer);
+    // Allocate memory for request bytes
+    final requestPtr = malloc<ffi.Uint8>(requestBytes.length);
+    final requestList = requestPtr.asTypedList(requestBytes.length);
+    requestList.setAll(0, requestBytes);
     
-    // Free the input string memory
-    malloc.free(namePointer);
-    
-    return result;
+    try {
+      // Call the login function
+      final resultPtr = binding.login(requestPtr, requestBytes.length);
+      
+      if (resultPtr == ffi.nullptr) {
+        return null;
+      }
+      
+      // Convert C string to Dart string
+      final base64String = resultPtr.cast<Utf8>().toDartString();
+      
+      // Free the returned string
+      binding.free_string(resultPtr);
+      
+      // Decode base64 to get protobuf bytes
+      return base64Decode(base64String);
+    } finally {
+      // Free the request memory
+      malloc.free(requestPtr);
+    }
   }
 }
