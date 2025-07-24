@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package admin;
+
+message AdminSettings {
+    int32 setting_id = 1;
+    string key = 2;
+    string value = 3;
+    string description = 4;
+}
+
+message GetSettingsRequest {
+    repeated string keys = 1;
+}
+
+message GetSettingsResponse {
+    repeated AdminSettings settings = 1;
+}
+
+message UpdateSettingsRequest {
+    repeated AdminSettings settings = 1;
+}
+
+message UpdateSettingsResponse {
+    bool success = 1;
+    string message = 2;
+}

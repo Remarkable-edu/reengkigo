@@ -1,5 +1,2 @@
-pub mod login {
-    include!(concat!(env!("OUT_DIR"), "/login.rs"));
-}
-
-pub use login::*;
+// Auto-generated proto modules
+include!(concat!(env!("OUT_DIR"), "/lib_generated.rs"));

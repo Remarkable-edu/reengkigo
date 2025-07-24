@@ -1,5 +1,9 @@
 .claude
 .DS_Store
+rust-test
+sample
 
 # build folder
 frontend/ffi_binary
+frontend/reengkigo_flutter/assets
+reengkigo-test

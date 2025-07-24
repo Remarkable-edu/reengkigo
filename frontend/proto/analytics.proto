@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package analytics;
+
+message EventData {
+    string event_type = 1;
+    int64 timestamp = 2;
+    string user_id = 3;
+    map<string, string> properties = 4;
+}
+
+message TrackEventRequest {
+    repeated EventData events = 1;
+}
+
+message TrackEventResponse {
+    bool success = 1;
+    int32 processed_count = 2;
+}

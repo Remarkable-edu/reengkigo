@@ -1,0 +1,14 @@
+[package]
+name = "error-lib"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+thiserror = "2.0"
+prost = "0.12"
+base64 = "0.21"
+anyhow = "1.0"
+reqwest = { version = "0.11", default-features = false, features = ["json", "rustls-tls"] }
+
+[lib]
+crate-type = ["rlib"]

@@ -1,11 +1,13 @@
 import 'dart:ffi' as ffi;
 import 'dart:io' show Platform;
-import 'dart:typed_data';
 import 'dart:convert';
 import 'package:ffi/ffi.dart';
+import 'package:flutter/foundation.dart';
 import 'package:reengkigo_flutter/generated/ffi/bindings.dart';
+import '../generated/login.pb.dart';
 
-
+/// Reengkigo FFI 저수준 인터페이스
+/// C 라이브러리와 직접 통신하는 기본 FFI 기능
 class ReengkigoFFI {
   static ReengkigoBindings? _bindings;
   
@@ -29,7 +31,8 @@ class ReengkigoFFI {
     }
   }
   
-  static Future<Uint8List?> login(Uint8List requestBytes) async {
+  /// 저수준 FFI 로그인 호출 - 프로토버프 바이트 입력/출력
+  static Future<Uint8List?> callLoginRaw(Uint8List requestBytes) async {
     final binding = bindings;
     
     // Allocate memory for request bytes
@@ -59,3 +62,28 @@ class ReengkigoFFI {
     }
   }
 }
+
+class ReengkigoApiClient {
+  Future<LoginResponse?> login(String account, String password) async {
+    try {
+      final loginRequest = LoginRequest()
+        ..account = account
+        ..password = password;
+
+      final requestBytes = loginRequest.writeToBuffer();
+      final responseBytes = await ReengkigoFFI.callLoginRaw(Uint8List.fromList(requestBytes));
+
+      if (responseBytes == null) {
+        return null;
+      }
+      return LoginResponse.fromBuffer(responseBytes);
+    } catch (e) {
+      // Logger를 사용하거나 디버그 모드에서만 출력
+      if (kDebugMode) {
+        debugPrint('ReengkigoApiClient.login error: $e');
+      }
+      return null;
+    }
+  }
+}
+

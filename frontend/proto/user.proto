@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package user;
+
+message UserProfile {
+    int32 user_id = 1;
+    string username = 2;
+    string email = 3;
+    string full_name = 4;
+    int64 created_at = 5;
+}
+
+message GetUserProfileRequest {
+    int32 user_id = 1;
+}
+
+message GetUserProfileResponse {
+    UserProfile profile = 1;
+}
+
+message UpdateUserProfileRequest {
+    int32 user_id = 1;
+    string username = 2;
+    string email = 3;
+    string full_name = 4;
+}
+
+message UpdateUserProfileResponse {
+    bool success = 1;
+    string message = 2;
+}

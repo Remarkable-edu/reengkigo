@@ -197,13 +197,106 @@ class Auth extends $pb.GeneratedMessage {
   void clearState() => clearField(6);
 }
 
-class LoginResponse extends $pb.GeneratedMessage {
-  factory LoginResponse({
-    Auth? auth,
+class ErrorDetail extends $pb.GeneratedMessage {
+  factory ErrorDetail({
+    $core.String? code,
+    $core.String? message,
+    $core.String? userMessage,
   }) {
     final $result = create();
+    if (code != null) {
+      $result.code = code;
+    }
+    if (message != null) {
+      $result.message = message;
+    }
+    if (userMessage != null) {
+      $result.userMessage = userMessage;
+    }
+    return $result;
+  }
+  ErrorDetail._() : super();
+  factory ErrorDetail.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory ErrorDetail.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ErrorDetail', package: const $pb.PackageName(_omitMessageNames ? '' : 'login'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'code')
+    ..aOS(2, _omitFieldNames ? '' : 'message')
+    ..aOS(3, _omitFieldNames ? '' : 'userMessage')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  ErrorDetail clone() => ErrorDetail()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  ErrorDetail copyWith(void Function(ErrorDetail) updates) => super.copyWith((message) => updates(message as ErrorDetail)) as ErrorDetail;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static ErrorDetail create() => ErrorDetail._();
+  ErrorDetail createEmptyInstance() => create();
+  static $pb.PbList<ErrorDetail> createRepeated() => $pb.PbList<ErrorDetail>();
+  @$core.pragma('dart2js:noInline')
+  static ErrorDetail getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ErrorDetail>(create);
+  static ErrorDetail? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get code => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set code($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasCode() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearCode() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get message => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set message($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasMessage() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearMessage() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get userMessage => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set userMessage($core.String v) { $_setString(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasUserMessage() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearUserMessage() => clearField(3);
+}
+
+enum LoginResponse_Result {
+  auth, 
+  error, 
+  notSet
+}
+
+/// 로그인 응답 구조체 (성공/실패 모두 처리)
+class LoginResponse extends $pb.GeneratedMessage {
+  factory LoginResponse({
+    $core.bool? success,
+    Auth? auth,
+    ErrorDetail? error,
+  }) {
+    final $result = create();
+    if (success != null) {
+      $result.success = success;
+    }
     if (auth != null) {
       $result.auth = auth;
+    }
+    if (error != null) {
+      $result.error = error;
     }
     return $result;
   }
@@ -211,8 +304,16 @@ class LoginResponse extends $pb.GeneratedMessage {
   factory LoginResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory LoginResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
+  static const $core.Map<$core.int, LoginResponse_Result> _LoginResponse_ResultByTag = {
+    2 : LoginResponse_Result.auth,
+    3 : LoginResponse_Result.error,
+    0 : LoginResponse_Result.notSet
+  };
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'LoginResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'login'), createEmptyInstance: create)
-    ..aOM<Auth>(1, _omitFieldNames ? '' : 'auth', subBuilder: Auth.create)
+    ..oo(0, [2, 3])
+    ..aOB(1, _omitFieldNames ? '' : 'success')
+    ..aOM<Auth>(2, _omitFieldNames ? '' : 'auth', subBuilder: Auth.create)
+    ..aOM<ErrorDetail>(3, _omitFieldNames ? '' : 'error', subBuilder: ErrorDetail.create)
     ..hasRequiredFields = false
   ;
 
@@ -237,16 +338,39 @@ class LoginResponse extends $pb.GeneratedMessage {
   static LoginResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<LoginResponse>(create);
   static LoginResponse? _defaultInstance;
 
+  LoginResponse_Result whichResult() => _LoginResponse_ResultByTag[$_whichOneof(0)]!;
+  void clearResult() => clearField($_whichOneof(0));
+
   @$pb.TagNumber(1)
-  Auth get auth => $_getN(0);
+  $core.bool get success => $_getBF(0);
   @$pb.TagNumber(1)
-  set auth(Auth v) { setField(1, v); }
+  set success($core.bool v) { $_setBool(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasAuth() => $_has(0);
+  $core.bool hasSuccess() => $_has(0);
   @$pb.TagNumber(1)
-  void clearAuth() => clearField(1);
-  @$pb.TagNumber(1)
-  Auth ensureAuth() => $_ensure(0);
+  void clearSuccess() => clearField(1);
+
+  @$pb.TagNumber(2)
+  Auth get auth => $_getN(1);
+  @$pb.TagNumber(2)
+  set auth(Auth v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasAuth() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearAuth() => clearField(2);
+  @$pb.TagNumber(2)
+  Auth ensureAuth() => $_ensure(1);
+
+  @$pb.TagNumber(3)
+  ErrorDetail get error => $_getN(2);
+  @$pb.TagNumber(3)
+  set error(ErrorDetail v) { setField(3, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasError() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearError() => clearField(3);
+  @$pb.TagNumber(3)
+  ErrorDetail ensureError() => $_ensure(2);
 }
 
 

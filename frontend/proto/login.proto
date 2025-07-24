@@ -16,6 +16,17 @@ message Auth {
     int32 state = 6;
 }
 
+message ErrorDetail {
+    string code = 1;
+    string message = 2;
+    string user_message = 3;
+}
+
+// 로그인 응답 구조체 (성공/실패 모두 처리)
 message LoginResponse {
-    Auth auth = 1;
+    bool success = 1;
+    oneof result {
+        Auth auth = 2;
+        ErrorDetail error = 3;
+    }
 }
